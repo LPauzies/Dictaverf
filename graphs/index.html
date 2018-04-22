@@ -1,0 +1,91 @@
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="/style.css" media="screen"/>
+<link rel="stylesheet" type="text/css" href="/jquery-ui.min.css"/>
+<link rel="stylesheet" type="text/css" href="/jquery-ui.theme.min.css"/>
+<!-- script src="/Chart.min.js"></script -->
+<script src="/ajax.js"></script>
+<script src="/jquery-1.11.3.min.js"></script>
+<script src="/jquery-ui.min.js"></script>
+<script src="/jqcloud.js"></script>
+<script type="text/javascript" language="javascript">
+
+function doRequest(){
+       $.ajax({
+         url: '/include/dict_queries.php',
+         dataType: "json",
+         data:{
+            graph: 2,
+            chr:   $('[name="stimul"]').val(),
+            test:  $('[name="test"]:checked').val()
+         },      
+         success:function(data){ 
+              console.log(JSON.stringify(data));
+              $('#cloud').html("");
+              $('#cloud').jQCloud('update',data);
+         },
+         error:function(xhr){ alert('error'); console.log(xhr);  }
+      });
+}
+
+$(function() {
+$('#autocomplete').autocomplete({
+       source: function(request, response) {
+            $.ajax({
+                url: '/include/dict_queries.php',
+                dataType: "json",
+                data: {
+                    term : request.term,
+                    dict : 'right'
+                },
+                success: function(data) {
+                    response($.map(data, function(item){
+                          return { label: item.word   }
+                    }));
+                }
+            });
+        },
+        select: function(event,ui){
+			$('#autocomplete').val(ui.item.value); 
+                        doRequest();
+		}
+      	
+      });
+});
+   function do_onLoad(){
+          $('[name="stimul"]').val('ami');
+          $('#cloud').jQCloud([], {
+		width: 500,
+		height: 300, 
+		fontSize: { from: 0.2, to: 0.02},
+		colors: ["#aab5f0", "#99ccee", "#a0ddff", "#90c5f0", "#90a0dd", "#90c5f0", "#3399dd", "#00ccff", "#00ccff", "#00ccff"],
+	        //shape: "rectangular"	
+	        
+	    });
+          doRequest();
+          //$('#cloud').jQCloud('update',[{"text":"terre","weight":"46"},{"text":"océan","weight":"45"},{"text":"eau","weight":"27"}]);
+   } 
+
+</script>
+</head>
+<body onload="do_onLoad();">
+<table width="100%" border=0>
+<tr><td width="*">&nbsp;</td>
+    <td width="500px">&nbsp;</td>
+    <td width="*">&nbsp;</td></tr>
+<tr><td>&nbsp;</td>
+    <td>
+    <form action="" onSubmit="doRequest(); return false;">
+    Stimul:&nbsp;<input type="text" name="stimul" id="autocomplete"><br>
+    Database:&nbsp;<input type="radio" name="test" value="12" checked>DAF<br>
+    Database DINAF:&nbsp;<input type="radio" name="test" value="29">France&nbsp;<input type="radio" name="test" value="30">Belgique&nbsp;<input type="radio" name="test" value="31">Suisse&nbsp;<input type="radio" name="test" value="32">Canada<br>
+    Database DINAFN:&nbsp;<input type="radio" name="test" value="24">France&nbsp;<input type="radio" name="test" value="25">Belgique&nbsp;<input type="radio" name="test" value="26">Suisse&nbsp;<input type="radio" name="test" value="27">Canada
+    <br>
+    <input type="hidden" value="1" name="graph">
+    <input type="submit" value="Refresh">
+    </form>
+    <div class="cloud" id="cloud"> Cloud goes here... <div>
+    <td>&nbsp;</td></tr>
+</table>
+</body>
+</html>

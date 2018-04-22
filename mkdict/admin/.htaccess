@@ -1,0 +1,5 @@
+AuthType Basic
+AuthUserFile /var/dictaverf/mkdict/inc/.htpasswd
+AuthName "Dict Admin's part"
+Require user admin
+

@@ -1,0 +1,53 @@
+.mmenu {
+}
+
+.sub_menu{
+	background:#c8ffb3;
+	height:35px;
+}
+
+.menu_act, .menu_def{
+	font-weight:bold;
+	font-size:10pt;
+	background-image: url("../img/m_act.gif");
+	width:150px;
+	height:30px;
+	text-align: center;
+}
+
+.menu_def {
+	background-image: url("../img/m_def.gif");
+	font-weight:normal;
+}
+.menu_empty{
+	background-image: url("../img/m_else.gif") ;
+	width: *;
+}
+
+.smenu_act, .smenu_def{
+	font-weight:bold;
+	font-size:10pt;
+	background-image: url("../img/sm_act.gif");
+	width:200px;
+	height:30px;
+	text-align: center;
+}
+
+.smenu_def {
+	font-weight:normal;
+	background-image: url("../img/sm_def.gif");
+}
+
+.data_frame{
+	padding: 10px 10px 10px 10px;
+	font-size:10pt;
+	background: url("../img/data.gif") repeat-x top;
+}
+.nchk{
+	color:red;
+}
+
+body{
+	margin:0 0 0 0;
+	font-size:10pt;
+}

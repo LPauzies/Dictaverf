@@ -1,0 +1,96 @@
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="/style.css" media="screen"/>
+<link rel="stylesheet" type="text/css" href="/jquery-ui.min.css"/>
+<link rel="stylesheet" type="text/css" href="/jquery-ui.theme.min.css"/>
+<!-- script src="/Chart.min.js"></script -->
+<script src="/ajax.js"></script>
+<script src="/jquery-1.11.3.min.js"></script>
+<script src="/jquery-ui.min.js"></script>
+<script src="/wordcloud2.js"></script>
+<script type="text/javascript" language="javascript">
+
+function doRequest(){
+       $.ajax({
+         url: '/include/dict_queries.php',
+         dataType: "json",
+         data:{
+            graph: 3,
+            chr:   $('[name="stimul"]').val(),
+            test:  $('[name="test"]:checked').val()
+         },      
+         success:function(data){ 
+//              console.log(JSON.stringify(data));
+//               console.log(data[0][0], data[0][1]);
+              var norm = data[0][1];
+              //$('#cloud').html("");
+              WordCloud($('#cloud')[0],{list:data,
+		  gridSize: Math.round(16 * $('#cloud').width() / 1024),
+                   drawMask: false,
+		  weightFactor: function (size) { var t = Math.round(size*150/norm); return t;},
+		  fontFamily: 'Times, serif',
+		  rotateRatio: 0.5,
+		  rotationSteps: 2});
+
+
+         },
+         error:function(xhr){ alert('error'); console.log(xhr);  }
+      });
+}
+
+$(function() {
+$('#autocomplete').autocomplete({
+       source: function(request, response) {
+            $.ajax({
+                url: '/include/dict_queries.php',
+                dataType: "json",
+                data: {
+                    term : request.term,
+                    dict : 'right'
+                },
+                success: function(data) {
+                    response($.map(data, function(item){
+                          return { label: item.word   }
+                    }));
+                }
+            });
+        },
+        select: function(event,ui){
+			$('#autocomplete').val(ui.item.value); 
+                        doRequest();
+		}
+      	
+      });
+});
+   function do_onLoad(){
+          $('[name="stimul"]').val('ami');
+//          console.log($('#cloud').width());
+//          console.log($('#cloud').height());
+          doRequest();
+   } 
+
+</script>
+</head>
+<body onload="do_onLoad();">
+<table width="100%" border=0>
+<tr><td width="*">&nbsp;</td>
+    <td width="500px">&nbsp;</td>
+    <td width="*">&nbsp;</td></tr>
+<tr><td>&nbsp;</td>
+    <td>
+    <form action="" onSubmit="doRequest(); return false;">
+    Stimul:&nbsp;<input type="text" name="stimul" id="autocomplete"><br>
+    Database:&nbsp;<input type="radio" name="test" value="12" checked>DAF<br>
+    Database DINAF:&nbsp;<input type="radio" name="test" value="29">France&nbsp;<input type="radio" name="test" value="30">Belgique&nbsp;<input type="radio" name="test" value="31">Suisse&nbsp;<input type="radio" name="test" value="32">Canada<br>
+    Database DINAFN:&nbsp;<input type="radio" name="test" value="24">France&nbsp;<input type="radio" name="test" value="25">Belgique&nbsp;<input type="radio" name="test" value="26">Suisse&nbsp;<input type="radio" name="test" value="27">Canada
+    <br>
+    <input type="hidden" value="1" name="graph">
+    <input type="submit" value="Refresh">
+    </form>
+    <div id="cloud_wrapper" style="width:700px;height:500px;">
+      <canvas class="cloud" id="cloud" width="700px" height="500px"> Cloud goes here... <canvas>
+    </div>
+    <td>&nbsp;</td></tr>
+</table>
+</body>
+</html>

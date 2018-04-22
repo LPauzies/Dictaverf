@@ -1,0 +1,98 @@
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="/style.css" media="screen"/>
+<link rel="stylesheet" type="text/css" href="/jquery-ui.min.css"/>
+<link rel="stylesheet" type="text/css" href="/jquery-ui.theme.min.css"/>
+<script src="/ajax.js"></script>
+<script src="/jquery-1.11.3.min.js"></script>
+<script src="/jquery.flot.js"></script>
+<script src="/jquery-ui.min.js"></script>
+<script type="text/javascript" language="javascript">
+    var option= {
+		lines: { show: true },
+		points: { show: true },
+		xaxis: { tickDecimals: 0, tickSize: 1 }
+		};
+function newChart(){
+    // $.plot($("#myChart"),[[1,100],[3,10]]);
+}
+
+function drawChart(ds){
+      if(!$('[name="joint"]').is(':checked')){
+	ds.splice(0,1);
+      }
+      $.plot($("#myChart"),[],option);
+      $.plot($("#myChart"),ds,option);
+}
+
+function doRequest(){
+       $.ajax({
+         url: '/include/dict_queries.php',
+         dataType: "json",
+         data:{
+            graph: 1,
+            chr:   $('[name="stimul"]').val(),
+            test:  $('[name="test"]:checked').val()
+         },      
+         success:function(data){ 
+              //console.log(JSON.stringify(data));
+              drawChart(data)
+         },
+         error:function(xhr){ alert('error'); console.log(xhr);  }
+      });
+}
+
+$(function() {
+$('#autocomplete').autocomplete({
+       source: function(request, response) {
+            $.ajax({
+                url: '/include/dict_queries.php',
+                dataType: "json",
+                data: {
+                    term : request.term,
+                    dict : 'right'
+                },
+                success: function(data) {
+                    response($.map(data, function(item){
+                          return { label: item.word   }
+                    }));
+                }
+            });
+        },
+        select: function(event,ui){
+			$('#autocomplete').val(ui.item.value); 
+                        doRequest();
+		}
+      	
+      });
+});
+   function do_onLoad(){
+      $('[name="stimul"]').val('ami');
+      doRequest();
+   } 
+
+</script>
+</head>
+<body onload="do_onLoad();">
+<table width="100%" border=0>
+<tr><td width="*">&nbsp;</td>
+    <td width="500px">&nbsp;</td>
+    <td width="*">&nbsp;</td></tr>
+<tr><td>&nbsp;</td>
+    <td>
+    <form action="" onSubmit="doRequest(); return false;">
+    Stimul:&nbsp;<input type="text" name="stimul" id="autocomplete"><br>
+    Database:&nbsp;<input type="radio" name="test" value="-1" checked> DINAFN <input type="radio" name="test" value="-2"> DINAF<br>
+    Database:&nbsp;<input type="checkbox" name="joint" checked> display "joint"<br>
+    <input type="hidden" value="1" name="graph">
+    <input type="submit" value="Refresh">
+    </form>
+    <div class="ctable">
+    <div class="ccell">
+    <div id="myChart" style="width:100%;height:250px;"></div>
+    </div></div>
+    </td>
+    <td>&nbsp;</td></tr>
+</table>
+</body>
+</html>
